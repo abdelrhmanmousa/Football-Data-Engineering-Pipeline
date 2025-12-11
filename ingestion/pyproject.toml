@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "game_ingestion"
+version = "1.0.0"
+description = "Ingestion logic for Football leagues Pipeline"
+requires-python = ">=3.9"
+dependencies = [
+    "boto3>=1.37.2",
+    "requests>=2.31.0",
+    "python-dotenv>=1.0.0",
+    "tenacity>=8.2.3"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

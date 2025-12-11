@@ -1,0 +1,18 @@
+# dagster deps
+dagster>=1.12.0
+dagster-webserver>=1.12.0
+dagster-postgres>=0.28.0
+dagster-docker>=0.28.0
+
+# INTEGRATIONS 
+dagster-dbt>=0.28.0
+pandas>=2.0.0
+boto3==1.37.2
+requests==2.31.0
+python-dotenv==1.0.0
+tenacity==8.2.3 
+
+# Analytics Deps
+dbt-core==1.10.15
+dbt-duckdb==1.10.0
+dbt-snowflake==1.10.3

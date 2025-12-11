@@ -1,0 +1,93 @@
+services:
+  # INFRASTRUCTURE
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    command: server /data --console-address ":9001"
+    env_file: ../.env
+    ports: ["9000:9000", "9001:9001"]
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./data/minio:/data
+    networks:
+      - gaming_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      retries: 3
+
+  create_buckets:
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    env_file: ../.env
+    networks:
+      - gaming_network
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      /usr/bin/mc mb myminio/${DATA_LAKE_BUCKET} || true;
+      /usr/bin/mc anonymous set public myminio/${DATA_LAKE_BUCKET};
+      exit 0;
+      "
+
+  postgres:
+    image: postgres:17.5-alpine
+    environment:
+      POSTGRES_USER: dagster
+      POSTGRES_PASSWORD: dagster
+      POSTGRES_DB: dagster
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - gaming_network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "dagster"]
+      interval: 10s
+      retries: 5
+
+  # DAGSTER SERVICES
+  # and inherit it for both daemon and webserver
+  dagster_common: &dagster_common
+    build:
+      context: ..
+      dockerfile: local_ops/Dockerfile
+    env_file: ../.env
+    environment:
+      - DAGSTER_POSTGRES_USER=dagster
+      - DAGSTER_POSTGRES_PASSWORD=dagster
+      - DAGSTER_POSTGRES_DB=dagster
+      - DAGSTER_POSTGRES_HOST=postgres
+      # Project Paths
+      - DBT_PROFILES_DIR=/opt/dagster/analytics
+      - DBT_PROJECT_DIR=/opt/dagster/analytics
+    volumes:
+      # Mount Code (Hot Reload)
+      - ../orchestration:/opt/dagster/app/orchestration
+      - ../ingestion:/opt/dagster/ingestion
+      - ../analytics:/opt/dagster/analytics
+      # Mount Config
+      - ./dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
+      # Mount Data
+      - ./data/warehouse:/data_warehouse
+    networks:
+      - gaming_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  dagster-webserver:
+    <<: *dagster_common
+    command: dagster-webserver -h 0.0.0.0 -p 3000 -w orchestration/workspace.yaml
+    ports:
+      - "3000:3000"
+
+  dagster-daemon:
+    <<: *dagster_common
+    command: dagster-daemon run -w orchestration/workspace.yaml
+
+networks:
+  Football_network:
+    driver: bridge
