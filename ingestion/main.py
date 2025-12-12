@@ -1,5 +1,5 @@
 import argparse
-from src.config import config
+from ingestion.src.utils.config import config
 from src.utils.logger import get_logger
 from src.entities.fixtures import FixturesIngestion
 
