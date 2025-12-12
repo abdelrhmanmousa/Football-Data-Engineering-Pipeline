@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# Local data (MinIO, Postgres, Dagster, DuckDB)
+local_Ops/data/
+
 # Distribution / packaging
 .Python
 build/
