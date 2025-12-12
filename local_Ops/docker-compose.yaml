@@ -11,7 +11,7 @@ services:
     volumes:
       - ./data/minio:/data
     networks:
-      - gaming_network
+      - Football_network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -24,7 +24,7 @@ services:
         condition: service_healthy
     env_file: ../.env
     networks:
-      - gaming_network
+      - Football_network
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
@@ -42,7 +42,7 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
     networks:
-      - gaming_network
+      - Football_network
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "dagster"]
       interval: 10s
@@ -53,7 +53,7 @@ services:
   dagster_common: &dagster_common
     build:
       context: ..
-      dockerfile: local_ops/Dockerfile
+      dockerfile: local_Ops/Dockerfile
     env_file: ../.env
     environment:
       - DAGSTER_POSTGRES_USER=dagster
@@ -73,7 +73,7 @@ services:
       # Mount Data
       - ./data/warehouse:/data_warehouse
     networks:
-      - gaming_network
+      - Football_network
     depends_on:
       postgres:
         condition: service_healthy
