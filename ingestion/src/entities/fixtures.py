@@ -1,5 +1,5 @@
 from datetime import datetime
-from src.config import config
+from ingestion.src.utils.config import config
 from src.connectors.football_api import FootballAPIClient
 from src.connectors.minio_storage import MinioStorage
 from src.utils.logger import get_logger
