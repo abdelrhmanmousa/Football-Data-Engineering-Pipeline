@@ -1,7 +1,8 @@
 import argparse
 from ingestion.src.utils.config import config
-from src.utils.logger import get_logger
-from src.entities.fixtures import FixturesIngestion
+from ingestion.src.utils.logger import get_logger
+from ingestion.src.entities.fixtures import FixturesIngestion
+from ingestion.src.entities.standings import StandingsIngestion
 
 # Initialize logger
 logger = get_logger("main")
@@ -34,10 +35,10 @@ def main():
         job.run()
     
     elif args.job == "standings":
-        # job = StandingsIngestion()
-        # job.run()
-        logger.warning("Standings ingestion not implemented yet")
-        pass
+        job = StandingsIngestion()
+        job.run()
+        # logger.warning("Standings ingestion not implemented yet")
+        # pass
         
     logger.info("Pipeline finished.")
 
