@@ -1,5 +1,9 @@
 # ingestion/src/config.py
 import os
+from dotenv import load_dotenv  
+
+# Load the .env file from the root directory
+load_dotenv() 
 
 class Config:
     # --- CHANGED: Renamed to generic API names ---
