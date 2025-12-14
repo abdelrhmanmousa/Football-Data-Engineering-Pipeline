@@ -25,7 +25,8 @@ class FixturesIngestion:
         return leagues[index]
 
     def run(self):
-        current_year = datetime.now().year
+       # current_year = datetime.now().year
+        current_year = 2023  # --- FIXED: Use 2023 season for consistent testing ---
         league_id = self._get_todays_league()
         
         # 1. Get Today's Date for the folder name
@@ -45,7 +46,7 @@ class FixturesIngestion:
 
         # 2. Fetch Data (The Connector handles Retries & Pagination internally)
         try:
-            data = self.api.get_all_pages(endpoint, params)
+            data = self.api.get(endpoint, params)
         except Exception as e:
             logger.critical(f"Stopping job due to API failure: {e}")
             return # Stop cleanly
