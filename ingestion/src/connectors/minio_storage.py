@@ -2,7 +2,7 @@ import boto3
 import json
 from io import BytesIO
 from ingestion.src.utils.config import config
-from src.utils.logger import get_logger
+from ingestion.src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
