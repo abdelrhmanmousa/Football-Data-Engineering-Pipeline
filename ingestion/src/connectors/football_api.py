@@ -3,7 +3,7 @@ import time
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from ingestion.src.utils.config import config
-from src.utils.logger import get_logger
+from ingestion.src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -81,3 +81,20 @@ class FootballAPIClient:
             time.sleep(1) # Be nice to the API (Don't get banned)
             
         return all_results
+    
+    # Add this method to class FootballAPIClient
+    
+    def get(self, endpoint: str, params: dict = None) -> list:
+        """
+        Simple GET for endpoints that DO NOT support pagination (like /fixtures).
+        """
+        if params is None:
+            params = {}
+            
+        logger.info(f"Fetching {endpoint} | Params: {params}")
+        
+        # We call the internal _request helper we already wrote
+        response_json = self._request(endpoint, params)
+        
+        # Return just the data list
+        return response_json.get("response", [])    
