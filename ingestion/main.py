@@ -3,6 +3,7 @@ from ingestion.src.utils.config import config
 from ingestion.src.utils.logger import get_logger
 from ingestion.src.entities.fixtures import FixturesIngestion
 from ingestion.src.entities.standings import StandingsIngestion
+from ingestion.src.entities.players import PlayersIngestion
 
 # Initialize logger
 logger = get_logger("main")
@@ -37,6 +38,11 @@ def main():
     elif args.job == "standings":
         job = StandingsIngestion()
         job.run()
+        
+    elif args.job == "players":
+        jon = PlayersIngestion()
+        jon.run()
+            
         # logger.warning("Standings ingestion not implemented yet")
         # pass
         
