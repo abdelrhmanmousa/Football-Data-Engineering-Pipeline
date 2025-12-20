@@ -1,0 +1,36 @@
+# MAKE SURE THIS NAME MATCHES dbt_project.yml "profile:" setting
+football_pipeline: 
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      # Use an env var for path, OR use a relative path that works locally
+      # This points to the folder we created in the makefile: local_Ops/data/warehouse
+      #path: '../local_Ops/data/warehouse/football.duckdb'
+      path: "{{ env_var('DUCKDB_PATH', '../local_Ops/data/warehouse/football.duckdb') }}"
+      
+      extensions:
+        - httpfs
+        - json  # <--- YOU NEED THIS TO READ JSON FILES
+        # - aws # (Optional: httpfs usually handles S3/MinIO fine without aws extension)
+
+      settings:
+        s3_region: us-east-1
+        s3_url_style: path
+        # Uses env var, defaults to localhost if missing (Good for local dev)
+        s3_endpoint: "{{ env_var('MINIO_ENDPOINT', 'localhost:9000') }}"
+        s3_access_key_id: "{{ env_var('MINIO_ROOT_USER', 'minioadmin') }}"
+        s3_secret_access_key: "{{ env_var('MINIO_ROOT_PASSWORD', 'minioadmin') }}"
+        s3_use_ssl: false
+
+    # FUTURE SNOWFLAKE CONFIG (Looks good)
+    snowflake:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ORGANIZATION_NAME') ~ '-' ~ env_var('SNOWFLAKE_ACCOUNT_NAME') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA') }}"
+      threads: 4

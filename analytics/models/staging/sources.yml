@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: football_lake
+    # Dynamic Schema Name:
+    # In DuckDB, we use 'main'. In Snowflake, we might use 'RAW'.
+    schema: "{{ 'main' if target.type == 'duckdb' else 'RAW' }}"
+
+    tables:
+      - name: raw_fixtures
+        description: "Raw fixtures data stored in JSON format in S3"
+        
+        meta:
+          external_location: "s3://football-lake/raw/fixtures/**/*.json"
+
+      - name: raw_standings
+        description: "Raw standings data stored in JSON format in S3"
+        
+        meta:
+          external_location: "s3://football-lake/raw/standings/**/*.json"
+    
+      - name: raw_players
+        description: "Raw players data stored in JSON format in S3"
+       
+        meta:
+          external_location: "s3://football-lake/raw/players/**/*.json"

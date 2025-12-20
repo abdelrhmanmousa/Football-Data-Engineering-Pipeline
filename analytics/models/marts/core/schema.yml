@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: fct_matches
+    columns:
+      - name: fixture_id
+        tests:
+          - unique
+          - not_null
+      - name: total_goals
+        tests:
+          - not_null
+      - name: match_status
+        tests:
+          - accepted_values:
+              values: 
+              - 'AET'
+              - 'FT'
+              - 'PEN'
+              - 'CANC'
+              - 'ABD'
+              - '1H'
+              - '2H'
+              - 'HT'
+              - 'LIVE'
+              - 'NS'
+              - 'TBD'
+
+  - name: dim_teams
+    columns:
+      - name: team_id
+        tests:
+          - unique
+          - not_null

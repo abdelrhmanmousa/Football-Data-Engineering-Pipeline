@@ -1,0 +1,31 @@
+name: 'football_pipeline'
+version: '1.0.0'
+config-version: 2
+
+# This must match the name in your profiles.yml
+profile: 'football_pipeline'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# CONFIGURATION FOR MODELS
+models:
+  football_pipeline:
+    # 1. Staging: Always materialize as Views (Virtual tables, cheaper, faster dev)
+    staging:
+      +materialized: view
+      +schema: staging
+
+    # 2. Marts: Materialize as Tables (Physical files, fast for querying)
+    marts:
+      +materialized: table
+      +schema: marts
