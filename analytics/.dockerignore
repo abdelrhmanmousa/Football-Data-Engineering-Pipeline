@@ -1,0 +1,24 @@
+# Ignore compiled artifacts
+target/
+dbt_modules/
+dbt_packages/
+
+# Ignore logs
+logs/
+
+# Ignore git history (Huge size reduction)
+.git/
+.gitignore
+
+# CRITICAL: Ignore secrets
+.env
+.env.*
+
+# Python artifacts
+__pycache__/
+*.pyc
+
+# OS artifacts
+.DS_Store
+
+
