@@ -27,7 +27,8 @@ flattened as (
         root.value:player:nationality::string as nationality,
         root.value:player:age::int as age,
         stats.value as stats,
-        to_date(split_part(metadata$filename, '=', 3), 'YYYY-MM-DD') as ingestion_date
+        -- FIX: Replace metadata$filename with CURRENT_DATE()
+        CURRENT_DATE() as ingestion_date
     from source,
     lateral flatten(input => source.$1) as root,
     lateral flatten(input => root.value:statistics) as stats

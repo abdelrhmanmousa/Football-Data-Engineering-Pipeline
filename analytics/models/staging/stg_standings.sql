@@ -36,7 +36,8 @@ flattened_teams as (
         root.value:league:season::int as season,
         -- Level 2 Value
         team_flat.value as rank_item,
-        to_date(split_part(metadata$filename, '=', 3), 'YYYY-MM-DD') as ingestion_date
+        -- FIX: Replace metadata$filename with CURRENT_DATE()
+        CURRENT_DATE() as ingestion_date
     from source,
     lateral flatten(input => source.$1) as root,
     lateral flatten(input => root.value:league:standings) as group_flat, -- Level 1
@@ -45,7 +46,12 @@ flattened_teams as (
 {% endif %}
 
 select
-    {{ dbt_utils.generate_surrogate_key(['league_id', 'rank_item.team.id', 'season']) }} as standing_key,
+        -- FIX: Use colon syntax for the JSON field inside the macro for Snowflake
+    {% if target.type == 'duckdb' %}
+        {{ dbt_utils.generate_surrogate_key(['league_id', 'rank_item.team.id', 'season']) }} as standing_key,
+    {% else %}
+        {{ dbt_utils.generate_surrogate_key(['league_id', 'rank_item:team:id', 'season']) }} as standing_key,
+    {% endif %}
 
     league_id,
     league_name,

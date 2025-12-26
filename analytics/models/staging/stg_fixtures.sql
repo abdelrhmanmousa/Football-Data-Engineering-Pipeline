@@ -36,33 +36,37 @@ flattened as (
     -- SNOWFLAKE: Needs to flatten the root variant column
     {% else %}
     select
-        {{ dbt_utils.generate_surrogate_key(['fixture.id', 'league.id', 'league.season']) }} as fixture_key,
+        {{ dbt_utils.generate_surrogate_key(['f.value:fixture:id', 'f.value:league:id', 'f.value:league:season']) }} as fixture_key,
 
-        value:fixture:id::int as fixture_id,
-        value:fixture:date::timestamp as match_date,
+        f.value:fixture:id::int as fixture_id,
+        f.value:fixture:date::timestamp as match_date,
         
-        value:league:id::int as league_id,
-        value:league:name::string as league_name,
-        value:league:country::string as league_country,
-        value:league:season::int as season,
+        f.value:league:id::int as league_id,
+        f.value:league:name::string as league_name,
+        f.value:league:country::string as league_country,
+        f.value:league:season::int as season,
 
-        value:teams:home:id::int as home_team_id,
-        value:teams:home:name::string as home_team_name,
-        value:teams:away:id::int as away_team_id,
-        value:teams:away:name::string as away_team_name,
+        f.value:teams:home:id::int as home_team_id,
+        f.value:teams:home:name::string as home_team_name,
+        f.value:teams:away:id::int as away_team_id,
+        f.value:teams:away:name::string as away_team_name,
 
-        value:goals:home::int as home_score,
-        value:goals:away::int as away_score,
+        f.value:goals:home::int as home_score,
+        f.value:goals:away::int as away_score,
 
-        value:fixture:venue:id::int as venue_id,
-        value:fixture:venue:name::string as venue_name,
-        value:fixture:venue:city::string as venue_city,
+        f.value:fixture:venue:id::int as venue_id,
+        f.value:fixture:venue:name::string as venue_name,
+        f.value:fixture:venue:city::string as venue_city,
 
-        value:fixture:status:short::string as match_status,
+        f.value:fixture:status:short::string as match_status,
         -- Snowflake parsing from filename/metadata
-        to_date(split_part(metadata$filename, '=', 3), 'YYYY-MM-DD') as ingestion_date
+        -- FIX 2: Check if ingestion_date is a column. 
+        -- If not, and you are using External Tables, use METADATA$FILENAME (no prefix)
+        -- If you are using regular tables, METADATA$FILENAME does not exist!
+        -- Safe bet: use CURRENT_DATE() if the metadata column isn't working
+        CURRENT_DATE() as ingestion_date
     from source,
-    lateral flatten(input => source.$1)
+    lateral flatten(input => source.$1) as f
     {% endif %}
 )
 
