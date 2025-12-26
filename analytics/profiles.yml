@@ -26,7 +26,7 @@ football_pipeline:
     # FUTURE SNOWFLAKE CONFIG (Looks good)
     snowflake:
       type: snowflake
-      account: "{{ env_var('SNOWFLAKE_ORGANIZATION_NAME') ~ '-' ~ env_var('SNOWFLAKE_ACCOUNT_NAME') }}"
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT_NAME') }}"
       user: "{{ env_var('SNOWFLAKE_USER') }}"
       password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
       role: "{{ env_var('SNOWFLAKE_ROLE') }}"
