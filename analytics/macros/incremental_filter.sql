@@ -3,12 +3,13 @@
 where {{ date_column }} >= (
     select
         {% if target.type == 'duckdb' %}
-            max(last_loaded_at) - interval '{{ lookback_days }} days'
+            coalesce(max(last_loaded_at), '1900-01-01') - interval '{{ lookback_days }} days'
         
         {% elif target.type == 'snowflake' %}
-            dateadd(day, -{{ lookback_days }}, max(last_loaded_at))
+            -- Coalesce ensures that if the table is empty, it uses 1900-01-01
+            dateadd(day, -{{ lookback_days }}, coalesce(max(last_loaded_at), '1900-01-01'::date))
         {% else %}
-            max(last_loaded_at)
+            coalesce(max(last_loaded_at), '1900-01-01')
         {% endif %}
     from {{ this }}
 )
