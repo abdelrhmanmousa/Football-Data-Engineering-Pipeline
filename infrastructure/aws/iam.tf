@@ -1,6 +1,3 @@
-# IAM ROLES AND POLICIES
-data "aws_caller_identity" "current" {}
-
 # ECS TASK EXECUTION ROLE
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "${var.project_name}_ecs_task_execution_role"
@@ -117,8 +114,8 @@ resource "aws_iam_policy" "sfn_policy" {
         Effect = "Allow",
         Action = ["ecs:RunTask"],
         Resource = [
-          aws_ecs_task_definition.ingestion.arn,
-          aws_ecs_task_definition.analytics.arn
+          aws_ecs_task_definition.ingestion_task.arn,
+          aws_ecs_task_definition.analytics_task.arn
         ]
       },
       {
