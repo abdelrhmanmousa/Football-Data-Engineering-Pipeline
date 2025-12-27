@@ -42,7 +42,7 @@ jobs:
           TF_VAR_snowflake_organization_name: ${{ secrets.SNOWFLAKE_ORGANIZATION_NAME }}
           TF_VAR_snowflake_user: ${{ secrets.SNOWFLAKE_USER }}
           TF_VAR_snowflake_password: ${{ secrets.SNOWFLAKE_PASSWORD }}
-          TF_VAR_rawg_api_key: ${{ secrets.FOOTBALL_API_KEY }}
+          TF_VAR_football_api_key: ${{ secrets.FOOTBALL_API_KEY }}
 
           
           TF_VAR_project_name: ${{ vars.PROJECT_NAME }}
