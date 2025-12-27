@@ -29,7 +29,7 @@ Ensure you have the following installed:
     # Local MinIO Credentials (Defaults are fine for local)
     MINIO_ROOT_USER=minioadmin
     MINIO_ROOT_PASSWORD=minioadmin
-    DATA_LAKE_BUCKET=rawg-lake
+    DATA_LAKE_BUCKET=football-lake
     ```
 
 ## 3. Starting the Stack
