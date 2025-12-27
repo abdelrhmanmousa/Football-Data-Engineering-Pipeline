@@ -67,12 +67,13 @@ make local-start
 
 ### Accessing Services
 
-. - **Dagster UI**: http://localhost:3000
-. - **MinIO Console**: http://localhost:9001 (minioadmin / minioadmin)
+- **Dagster UI:** http://localhost:3000
+- **MinIO Console:** http://localhost:9001  
+  *(minioadmin / minioadmin)*
 
 ### Stopping Services
-. - **Stop**: ```make local-stop```
-. - **Reset (Delete data)**: ```make local-clean```
+- **Stop:** ```make local-stop```
+- **Reset (Delete data):** ```make local-clean```
 
 ## 4. Cloud Infrastructure Provisioning
 
