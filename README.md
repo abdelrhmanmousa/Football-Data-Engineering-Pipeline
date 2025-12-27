@@ -17,7 +17,7 @@ The system runs in two modes with complete feature parity:
 The system uses a **Hybrid Architecture** to optimize for both Developer Experience (Local) and Cost-Effective Scaling (Cloud).
 
 ### 🗺️ System Flow
-![Architecture Diagram](https://via.placeholder.com/800x400?text=Football+Pipeline+Architecture+Diagram)
+![Architecture Diagram](/home/mousa/Projects/Football-Data-Engineering-Pipeline/Docs/assets/diagram-export-12-27-2025-9_42_33-AM.png)
 
 *   **Idempotent Ingestion:** "Smart Resume" logic checks storage before fetching, preventing API rate-limit exhaustion from football data providers.
 *   **Hybrid Design:** Switch between a local lightweight stack and a heavy-duty enterprise cloud stack with a single config change.
@@ -75,4 +75,4 @@ We utilize **GitHub Actions** for a fully automated DevSecOps workflow. 🛡️
 1. **Configure Environment:**
    ```bash
    cp .env.example .env
-   # Add your Football API Key (e.g., API-Football or RAWG)
+   # Add your Football API Key (e.g., API-Football )
