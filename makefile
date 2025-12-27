@@ -4,7 +4,7 @@
 COMPOSE_FILE=local_Ops/docker-compose.yaml
 ENV_FILE=.env
 PROJECT_NAME ?= FootballDataPipeline
-AWS_REGION ?= us-east-1
+AWS_REGION ?= af-south-1
 
 # Export them so scripts and Terraform pick them up automatically
 export PROJECT_NAME
@@ -67,3 +67,55 @@ local-stop:
 .PHONY: local-logs
 local-logs:
 	@docker compose -f $(COMPOSE_FILE) logs -f
+
+.PHONY: local-shell
+local-shell:
+	@echo ">> Entering Dagster Daemon Container..."
+	@echo "   (You can run 'dagster job list' or python scripts here)"
+	@docker exec -it local_ops-dagster-daemon-1 bash
+
+.PHONY: local-dbt
+local-dbt:
+	@echo "running dbt..."
+	@docker exec -it local_ops-dagster-daemon-1 bash -c "cd /opt/dagster/analytics && dbt build"
+
+.PHONY: local-clean
+local-clean: local-stop
+	@echo ">> Cleaning up ALL data..."
+	@# We use sudo because Docker creates files as root inside these folders
+	@sudo rm -rf local_ops/data
+	@echo ">>> Clean complete. Project is reset."
+
+# ==============================================================================
+# PRODUCTION OPERATIONS
+# ==============================================================================
+.PHONY: prod-build-push
+prod-build-push:
+	@echo ">> Building and Pushing Docker Images..."
+	@chmod +x scripts/build_and_push.sh
+	@./scripts/build_and_push.sh
+
+.PHONY: prod-infra-apply
+prod-infra-apply:
+	@echo ">> Deploying Infrastructure..."
+	@chmod +x scripts/deploy_smart_infra.sh
+	@./scripts/deploy_smart_infra.sh
+
+.PHONY: prod-infra-destroy
+prod-infra-destroy:
+	@echo "!! DESTROYING INFRASTRUCTURE !!"
+	@echo "Are you sure? [y/N] " && read ans && [ $${ans:-N} = y ]
+	@cd infrastructure/aws && terraform destroy -auto-approve
+	@cd infrastructure/snowflake && terraform destroy -auto-approve
+
+.PHONY: prod-deploy-all
+prod-deploy-all: prod-infra-apply prod-build-push
+	@echo ">>> Full Deployment Complete!"
+
+
+.PHONY: prod-restart
+prod-restart:
+	@echo ">> Force updating ECS Services..."
+	@aws ecs update-service --cluster $(PROJECT_NAME)-cluster --service ingestion-service --force-new-deployment > /dev/null
+	@aws ecs update-service --cluster $(PROJECT_NAME)-cluster --service analytics-service --force-new-deployment > /dev/null
+	@echo ">>> ECS Services restarting with new images."	

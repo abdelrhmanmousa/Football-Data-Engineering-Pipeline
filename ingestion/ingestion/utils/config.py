@@ -1,19 +1,22 @@
 # ingestion/src/config.py
 import os
-from dotenv import load_dotenv  
+from dotenv import load_dotenv
 
 # Load the .env file from the root directory
-load_dotenv() 
+load_dotenv()
+
 
 class Config:
     # --- CHANGED: Renamed to generic API names ---
     API_KEY = os.getenv("FOOTBALL_API_KEY")
     # Assuming you are using API-Football (based on your diagram)
-    BASE_URL = "https://v3.football.api-sports.io" 
-    
+    BASE_URL = "https://v3.football.api-sports.io"
+
     # --- Storage Config (Kept mostly the same) ---
     AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY_ID") or os.getenv("MINIO_ROOT_USER")
-    AWS_SECRET_KEY = os.getenv("AWS_SECRET_ACCESS_KEY") or os.getenv("MINIO_ROOT_PASSWORD")
+    AWS_SECRET_KEY = os.getenv("AWS_SECRET_ACCESS_KEY") or os.getenv(
+        "MINIO_ROOT_PASSWORD"
+    )
 
     _raw_endpoint = os.getenv("MINIO_ENDPOINT")
 
@@ -27,17 +30,18 @@ class Config:
         S3_ENDPOINT = None
 
     BUCKET_NAME = os.getenv("DATA_LAKE_BUCKET", "football-lake")
-    
+
     # LOGIC CONFIGURATION
     # We put the list here. In the future, you can load this from a DB or a file easily.
     # 39=Premier League, 140=La Liga, 78=Bundesliga, 135=Serie A, 61=Ligue 1
-    WATCHED_LEAGUES = [39, 140, 78, 135, 61] 
+    WATCHED_LEAGUES = [39, 140, 78, 135, 61]
 
     def validate(self):
         if not self.API_KEY:
             raise ValueError("Missing FOOTBALL_API_KEY in environment variables.")
         if self.S3_ENDPOINT and (not self.AWS_ACCESS_KEY or not self.AWS_SECRET_KEY):
-             raise ValueError("Missing Storage Credentials for MinIO/Custom S3.")
+            raise ValueError("Missing Storage Credentials for MinIO/Custom S3.")
         return True
+
 
 config = Config()
