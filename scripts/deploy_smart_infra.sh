@@ -43,7 +43,7 @@ terraform init -upgrade
 terraform apply -auto-approve \
     -var="snowflake_iam_user=" \
     -var="snowflake_external_id=" \
-    # -var="football_api_key=${FOOTBALL_API_KEY}"
+# -var="football_api_key=${FOOTBALL_API_KEY}"
 
 # Capture Outputs
 AWS_ROLE_ARN=$(terraform output -raw snowflake_role_arn)
@@ -76,10 +76,11 @@ cd "$AWS_DIR"
 terraform apply -auto-approve \
     -var="snowflake_iam_user=$SF_USER" \
     -var="snowflake_external_id=$SF_EXT_ID" \
-   # -var="football_api_key=${FOOTBALL_API_KEY}"
+  
+# -var="football_api_key=${FOOTBALL_API_KEY}"
 
 echo "⏳ Waiting for IAM changes to propagate..."
-sleep 15
+sleep 60
 
 echo "Phase 4: Snowflake Tables (Creating External Tables)"
 cd "$SNOWFLAKE_DIR"

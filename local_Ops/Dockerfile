@@ -14,12 +14,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Ingestion Package (Editable Mode logic handled in Compose)
 # We copy it here for the build layer, but Compose over-mounts it.
-COPY ingestion /opt/dagster/ingestion
-RUN pip install -e /opt/dagster/ingestion
+COPY ingestion /opt/dagster/app/ingestion
+RUN pip install -e /opt/dagster/app/ingestion
 
 # Environment Variables for Paths
 ENV DAGSTER_HOME=/opt/dagster/dagster_home
-ENV PYTHONPATH="${PYTHONPATH}:/opt/dagster/ingestion"
+#ENV PYTHONPATH="${PYTHONPATH}:/opt/dagster/ingestion"
 
 # Create the Dagster Home directory
 RUN mkdir -p $DAGSTER_HOME

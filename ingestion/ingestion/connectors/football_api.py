@@ -2,8 +2,8 @@ import requests
 import time
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-from ingestion.src.utils.config import config
-from ingestion.src.utils.logger import get_logger
+from utils.config import config
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 

@@ -6,8 +6,32 @@ __pycache__/
 # C extensions
 *.so
 
+
+# Terraform files
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Terraform variable files containing sensitive data
+infrastructure/aws/terraform.tfvars   
+
+infrastructure/snowflake/terraform.tfvars
+
+
+
+# DBT files
+analytics/target/
+analytics/dbt_packages/
+analytics/logs/
+analytics/profiles.yml   
+
+
 # Local data (MinIO, Postgres, Dagster, DuckDB)
-local_Ops/data/
+local_Ops/
+data/
+postgres/
+minio/
+*.duckdb
 
 # Distribution / packaging
 .Python

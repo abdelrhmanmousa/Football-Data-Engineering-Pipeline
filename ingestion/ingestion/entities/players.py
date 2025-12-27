@@ -1,8 +1,8 @@
 from datetime import datetime
-from ingestion.src.connectors.football_api import FootballAPIClient
-from ingestion.src.connectors.minio_storage import MinioStorage
-from ingestion.src.utils.config import config
-from ingestion.src.utils.logger import get_logger
+from connectors.football_api import FootballAPIClient
+from connectors.minio_storage import MinioStorage
+from utils.config import config
+from utils.logger import get_logger
 
 logger = get_logger(__name__)
 

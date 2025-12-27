@@ -2,7 +2,7 @@
 set -e
 
 # Configuration
-AWS_REGION="us-east-1"
+AWS_REGION="af-south-1"  # Ensure this matches your .env or desired region
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ECR_URL="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
@@ -20,7 +20,7 @@ aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --
 
 # 2. Build & Push INGESTION
 echo "📦 Building Ingestion Image..."
-docker build -f ingestion/Dockerfile -t ${PROJECT_NAME}-ingestion:latest .
+docker build -f ingestion/Dockerfile -t ${PROJECT_NAME}-ingestion:latest ./ingestion
 
 echo "⬆️  Pushing Ingestion Image..."
 docker tag ${PROJECT_NAME}-ingestion:latest ${ECR_URL}/${PROJECT_NAME}-ingestion:latest
@@ -33,8 +33,12 @@ docker build -f analytics/Dockerfile -t ${PROJECT_NAME}-analytics:latest ./analy
 
 echo "⬆️  Pushing Analytics Image..."
 docker tag ${PROJECT_NAME}-analytics:latest ${ECR_URL}/${PROJECT_NAME}-analytics:latest
-docker push ${ECR_URL}/${PROJECT_NAME}-analytics:latest
 
+until docker push ${ECR_URL}/${PROJECT_NAME}-analytics:latest; do
+
+  echo "⚠️  Analytics push failed/timed out. Retrying in 5 seconds..."
+  sleep 5
+done
 echo "----------------------------------------------------"
 echo "✅ SUCCESS! Images are live in ECR."
 echo "----------------------------------------------------"

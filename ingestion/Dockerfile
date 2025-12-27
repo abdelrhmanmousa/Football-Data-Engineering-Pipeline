@@ -11,5 +11,5 @@ RUN pip install --no-cache-dir .
 RUN useradd -m appuser && chown -R appuser /app
 USER appuser
 
-ENTRYPOINT ["python", "main.py"]
+ENTRYPOINT ["python", "ingestion.py"]
 CMD ["--help"]

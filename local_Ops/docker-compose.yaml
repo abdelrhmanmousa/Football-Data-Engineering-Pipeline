@@ -63,10 +63,16 @@ services:
       # Project Paths
       - DBT_PROFILES_DIR=/opt/dagster/analytics
       - DBT_PROJECT_DIR=/opt/dagster/analytics
+      # This overrides the localhost value from your .env file
+      - MINIO_ENDPOINT=minio:9000
+
+      # This ensures dbt writes to the mounted volume, not a non-existent local folder
+      - DUCKDB_PATH=/data_warehouse/football.duckdb
+
     volumes:
       # Mount Code (Hot Reload)
       - ../orchestration:/opt/dagster/app/orchestration
-      - ../ingestion:/opt/dagster/ingestion
+      - ../ingestion:/opt/dagster/app/ingestion
       - ../analytics:/opt/dagster/analytics
       # Mount Config
       - ./dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
@@ -77,6 +83,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      minio:
+        condition: service_healthy  
 
   dagster-webserver:
     <<: *dagster_common

@@ -1,9 +1,9 @@
 import argparse
-from ingestion.src.utils.config import config
-from ingestion.src.utils.logger import get_logger
-from ingestion.src.entities.fixtures import FixturesIngestion
-from ingestion.src.entities.standings import StandingsIngestion
-from ingestion.src.entities.players import PlayersIngestion
+from utils.config import config
+from utils.logger import get_logger
+from entities.fixtures import FixturesIngestion
+from entities.standings import StandingsIngestion
+from entities.players import PlayersIngestion
 
 # Initialize logger
 logger = get_logger("main")
@@ -48,5 +48,3 @@ def main():
         
     logger.info("Pipeline finished.")
 
-if __name__ == "__main__":
-    main()
