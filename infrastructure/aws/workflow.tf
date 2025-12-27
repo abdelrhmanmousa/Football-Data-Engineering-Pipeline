@@ -15,11 +15,11 @@ resource "aws_sfn_state_machine" "pipeline" {
             StartAt = "IngestFixtures",
             States = {
               IngestFixtures = {
-                Type = "Task",
+                Type     = "Task",
                 Resource = "arn:aws:states:::ecs:runTask.sync",
                 Parameters = {
-                  LaunchType = "FARGATE",
-                  Cluster = aws_ecs_cluster.main.arn,
+                  LaunchType     = "FARGATE",
+                  Cluster        = aws_ecs_cluster.main.arn,
                   TaskDefinition = aws_ecs_task_definition.ingestion_task.arn,
                   NetworkConfiguration = {
                     AwsvpcConfiguration = {
@@ -44,11 +44,11 @@ resource "aws_sfn_state_machine" "pipeline" {
             StartAt = "IngestPlayers",
             States = {
               IngestPlayers = {
-                Type = "Task",
+                Type     = "Task",
                 Resource = "arn:aws:states:::ecs:runTask.sync",
                 Parameters = {
-                  LaunchType = "FARGATE",
-                  Cluster = aws_ecs_cluster.main.arn,
+                  LaunchType     = "FARGATE",
+                  Cluster        = aws_ecs_cluster.main.arn,
                   TaskDefinition = aws_ecs_task_definition.ingestion_task.arn,
                   NetworkConfiguration = {
                     AwsvpcConfiguration = {
@@ -59,7 +59,7 @@ resource "aws_sfn_state_machine" "pipeline" {
                   },
                   Overrides = {
                     ContainerOverrides = [{
-                      Name = "ingestion-container",
+                      Name    = "ingestion-container",
                       Command = ["--job", "players"]
                     }]
                   }
@@ -73,11 +73,11 @@ resource "aws_sfn_state_machine" "pipeline" {
             StartAt = "IngestStandings",
             States = {
               IngestStandings = {
-                Type = "Task",
+                Type     = "Task",
                 Resource = "arn:aws:states:::ecs:runTask.sync",
                 Parameters = {
-                  LaunchType = "FARGATE",
-                  Cluster = aws_ecs_cluster.main.arn,
+                  LaunchType     = "FARGATE",
+                  Cluster        = aws_ecs_cluster.main.arn,
                   TaskDefinition = aws_ecs_task_definition.ingestion_task.arn,
                   NetworkConfiguration = {
                     AwsvpcConfiguration = {
@@ -88,7 +88,7 @@ resource "aws_sfn_state_machine" "pipeline" {
                   },
                   Overrides = {
                     ContainerOverrides = [{
-                      Name = "ingestion-container",
+                      Name    = "ingestion-container",
                       Command = ["--job", "standings"]
                     }]
                   }
@@ -101,22 +101,22 @@ resource "aws_sfn_state_machine" "pipeline" {
       },
       # 2. Run dbt after ingestion is done
       RunDBT = {
-        Type = "Task",
+        Type     = "Task",
         Resource = "arn:aws:states:::ecs:runTask.sync",
         Parameters = {
-          LaunchType = "FARGATE",
-          Cluster = aws_ecs_cluster.main.arn,
+          LaunchType     = "FARGATE",
+          Cluster        = aws_ecs_cluster.main.arn,
           TaskDefinition = aws_ecs_task_definition.analytics_task.arn,
           NetworkConfiguration = {
             AwsvpcConfiguration = {
-                Subnets        = data.aws_subnets.default.ids
-                SecurityGroups = [aws_security_group.ecs_sg.id]
-               AssignPublicIp = "ENABLED"
+              Subnets        = data.aws_subnets.default.ids
+              SecurityGroups = [aws_security_group.ecs_sg.id]
+              AssignPublicIp = "ENABLED"
             }
           },
           Overrides = {
             ContainerOverrides = [{
-              Name = "analytics-container",
+              Name    = "analytics-container",
               Command = ["/bin/sh", "-c", "dbt build --target snowflake"]
               ## run this to force full refresh for the first time
               ##Command = ["/bin/sh", "-c", "dbt build --target snowflake","--full-refresh"]
