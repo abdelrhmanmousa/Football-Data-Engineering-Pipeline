@@ -1,0 +1,61 @@
+name: CD - Infrastructure
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'infrastructure/**'
+      - 'scripts/deploy_smart_infra.sh'
+  workflow_dispatch:
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  # Dynamic ARN construction using the Secret
+  ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/football-pipeline-github-actions-role
+
+jobs:
+  deploy-infra:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.0
+
+      - name: Apply Infrastructure
+        env:
+
+          PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+
+          TF_VAR_snowflake_account_name: ${{ secrets.SNOWFLAKE_ACCOUNT_NAME }}
+          TF_VAR_snowflake_organization_name: ${{ secrets.SNOWFLAKE_ORGANIZATION_NAME }}
+          TF_VAR_snowflake_user: ${{ secrets.SNOWFLAKE_USER }}
+          TF_VAR_snowflake_password: ${{ secrets.SNOWFLAKE_PASSWORD }}
+          TF_VAR_rawg_api_key: ${{ secrets.FOOTBALL_API_KEY }}
+
+          
+          TF_VAR_project_name: ${{ vars.PROJECT_NAME }}
+          
+          
+          TF_VAR_github_repo: ${{ github.repository }}
+
+          
+          TF_VAR_snowflake_role: "ACCOUNTADMIN"
+          TF_VAR_snowflake_warehouse: "COMPUTE_WH"
+          TF_VAR_snowflake_database: "FOOTBALL_LEAGUES_DB"
+          TF_VAR_snowflake_schema: "ANALYTICS"
+
+
+          RAWG_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
+        run: make prod-infra-apply

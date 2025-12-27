@@ -1,0 +1,42 @@
+name: CD - Application
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'ingestion/**'
+      - 'analytics/**'
+      - 'scripts/build_and_push.sh'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  # Define it dynamically (Uses GitHub Variable if set, defaults to 'game-market')
+  PROJECT_NAME: ${{ vars.PROJECT_NAME || 'football-data-pipeline' }}
+  AWS_REGION: af-south-1
+  ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/football-pipeline-github-actions-role
+
+jobs:
+  deploy-app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Use Make (Inherits PROJECT_NAME from env)
+      - name: Build and Push Images
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: make prod-build-push

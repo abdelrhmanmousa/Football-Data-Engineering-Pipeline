@@ -1,0 +1,61 @@
+name: CI - Quality Gate
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-ingestion:
+    name: Lint Python (Ingestion)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Linting Tools
+        run: pip install ruff
+      - name: Run Ruff
+        run: ruff check ingestion/
+
+  validate-infra:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform Format
+        run: terraform fmt -check -recursive infrastructure/
+      - name: Terraform Validate
+        run: |
+          cd infrastructure/aws
+          terraform init -backend=false # we don't need real backend for validation
+          terraform validate
+
+  dbt-parse:
+    name: Parse dbt Models
+    runs-on: ubuntu-latest
+    env:
+      # Dummy values just to allow dbt to start up
+      SNOWFLAKE_ACCOUNT_NAME: "dummy_user"
+      SNOWFLAKE_ORGANIZATION_NAME: "dummy_org"
+      SNOWFLAKE_USER: "dummy_user"
+      SNOWFLAKE_PASSWORD: "dummy_password"
+      SNOWFLAKE_ROLE: "dummy_role"
+      SNOWFLAKE_WAREHOUSE: "dummy_warehouse"
+      SNOWFLAKE_DATABASE: "dummy_database"
+      SNOWFLAKE_SCHEMA: "dummy_schema"
+      
+      
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dbt
+        run: pip install dbt-snowflake==1.10.3
+      - name: Parse Project
+        run: |
+          cd analytics
+          dbt deps
+          dbt parse --profiles-dir . --target snowflake
