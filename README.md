@@ -76,3 +76,24 @@ We utilize **GitHub Actions** for a fully automated DevSecOps workflow. 🛡️
    ```bash
    cp .env.example .env
    # Add your Football API Key (e.g., API-Football )
+
+2. **Start Services:**
+```Bash
+make local-start 
+```
+3. **Access UI:**
+- Dagster: http://localhost:3000
+- MinIO: http://localhost:9001
+
+### B. ☁️ Production Deployment (CI/CD)
+
+Manual deployment is only required for the initial bootstrap. Once OIDC is established, GitHub Actions handles the rest.
+
+1. Fork Repository.
+2. Configure Secrets: Add AWS Account ID, API Keys, and Snowflake Credentials to GitHub Secrets. (see [CI/CD Guide](./docs/cicd.md))
+3. Bootstrap OIDC:
+```Bash
+export TF_VAR_github_repo="your-username/your-repo"
+make prod-infra-apply
+```
+4. Push: Any commit to main will automatically deploy Infrastructure and Code updates. 🚀
