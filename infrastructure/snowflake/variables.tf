@@ -10,11 +10,6 @@
 # }
 
 # We need the AWS Role ARN to allow Snowflake to read S3
-variable "storage_aws_role_arn" {
-    type = string
-   
-}
-
 
 variable "snowflake_account_name" {
   type = string
