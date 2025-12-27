@@ -2,7 +2,7 @@
 This project follows a Modern Data Stack (MDS) approach, emphasizing idempotency, hybrid execution, and cost-efficiency. The pipeline follows an ELT (Extract, Load, Transform) pattern: data is extracted from API-Football, loaded into an S3-based Data Lake in raw JSON format, and transformed directly within the Data Warehouse.
 
 ### 🗺️ High Level Design
-![Architecture Diagram](Docs/assets/Architecture.png)
+![Architecture Diagram](assets/Architecture.png)
 
 ## Core Conceptss
 
@@ -39,7 +39,7 @@ We use a "Best Tool for the Job" strategy to balance developer experience with p
 | Feature | 🏠 Local (Dagster) | ☁️ Cloud (Step Functions)|
 | :--- | :--- | :--- |
 | **Cost** | Free (Local Resources) | Serverless (Pay-per-transition) |
-| **Paradigm | Asset-based (Software Defined Assets) | Task-based (State Machine) |
+| **Paradigm** | Asset-based (Software Defined Assets) | Task-based (State Machine) |
 | **Environment** | Docker Compose | AWS Fargate (Serverless Containers) |
 | **Transform** | dbt-duckdb | dbt-snowflake |
 
