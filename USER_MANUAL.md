@@ -41,7 +41,7 @@ cp .env.example .env
 ```
 
 ### Configure Variables: Open ```.env``` and populate the following:
-- ```FOOTBALL_API_KEY``: Your API key from API-Football.
+- ```FOOTBALL_API_KEY```: Your API key from API-Football.
 - ```AWS_REGION```: Set to af-south-1 (Cape Town).or any region you want 
 - ```TF_VAR_snowflake_account_name```: Your Snowflake account (e.g., RC94843).
 - ```TF_VAR_snowflake_organization_name```: Your Snowflake org (e.g., JMNXNY).
@@ -51,9 +51,9 @@ cp .env.example .env
 ## 3. Local Development
 
 The local environment replicates the cloud architecture using lightweight tools.
-. **MinIO**: Replaces AWS S3 (Object Storage).
-. **DuckDB**: Replaces Snowflake (OLAP Database).
-. **Dagster**: Replaces Step Functions (Orchestration).
+- . **MinIO**: Replaces AWS S3 (Object Storage).
+- . **DuckDB**: Replaces Snowflake (OLAP Database).
+- . **Dagster**: Replaces Step Functions (Orchestration).
 
 ### Starting the Environment
 ```bash
@@ -67,12 +67,12 @@ make local-start
 
 ### Accessing Services
 
-. **Dagster UI**: http://localhost:3000
-. **MinIO Console**: http://localhost:9001 (minioadmin / minioadmin)
+. - **Dagster UI**: http://localhost:3000
+. - **MinIO Console**: http://localhost:9001 (minioadmin / minioadmin)
 
 ### Stopping Services
-. **Stop**: ```make local-stop```
-. **Reset (Delete data)**: ```make local-clean```
+. - **Stop**: ```make local-stop```
+. - **Reset (Delete data)**: ```make local-clean```
 
 ## 4. Cloud Infrastructure Provisioning
 
@@ -84,10 +84,10 @@ Cloud deployment uses Terraform to build the AWS and Snowflake environment.
 make prod-infra-apply
 ```
 #### What happens in the 4 phases:
-  . **Phase 1 (AWS)**: Creates S3 Data Lake and IAM Execution Roles.
-  . **Phase 2 (Snowflake)**: Creates the Storage Integration and IAM OIDC link.
-  . **Phase 3 (AWS)**: Updates IAM Roles to trust Snowflake (Bi-directional trust).
-  . **Phase 4 (Snowflake)**: Creates External Tables, Databases, and Stages.
+ - . **Phase 1 (AWS)**: Creates S3 Data Lake and IAM Execution Roles.
+ - . **Phase 2 (Snowflake)**: Creates the Storage Integration and IAM OIDC link.
+ - . **Phase 3 (AWS)**: Updates IAM Roles to trust Snowflake (Bi-directional trust).
+ - . **Phase 4 (Snowflake)**: Creates External Tables, Databases, and Stages.
 
 ## 5. Code Deployment
 
@@ -98,30 +98,30 @@ Once infrastructure is ready, push your Python and dbt code to the cloud.
 make prod-build-push
 ```
 ### What this script does:
-   .Authenticates with Amazon ECR.
-   .Builds the ```ingestion``` and ```analytics``` Docker images.
-   .**Note**: It uses an automated retry loop to handle unstable connections to the ```af-south-1``` region.
+  - .Authenticates with Amazon ECR.
+  - .Builds the ```ingestion``` and ```analytics``` Docker images.
+  - .**Note**: It uses an automated retry loop to handle unstable connections to the ```af-south-1``` region.
 
 ## 6. CI/CD Workflow
 
 The project is fully automated via GitHub Actions.
 
-1. **CI (Quality Gate)**: Triggered on Pull Requests. Runs Python linting (Ruff), Terraform validation, and dbt parse.
-2. **CD (Deployment)**: Triggered on Merge to main.
-       .. ```CD - Infrastructure```: Automatically runs Terraform Apply.
-       .. ```CD - Application```: Automatically builds and pushes Docker images to ECR.
+- 1. **CI (Quality Gate)**: Triggered on Pull Requests. Runs Python linting (Ruff), Terraform validation, and dbt parse.
+- 2. **CD (Deployment)**: Triggered on Merge to main.
+       - .. ```CD - Infrastructure```: Automatically runs Terraform Apply.
+       - .. ```CD - Application```: Automatically builds and pushes Docker images to ECR.
 
 ### Required GitHub Secrets:
-    .AWS_ACCOUNT_ID, AWS_REGION, ROLE_ARN
-    .SNOWFLAKE_PASSWORD, SNOWFLAKE_ACCOUNT_NAME, SNOWFLAKE_ORGANIZATION_NAME
-    .```FOOTBALL_API_KEY```
+    - .``AWS_ACCOUNT_ID``, ``AWS_REGION``,`` ROLE_ARN``
+    .``SNOWFLAKE_PASSWORD``, ``SNOWFLAKE_ACCOUNT_NAME``, ``SNOWFLAKE_ORGANIZATION_NAME``
+    .``FOOTBALL_API_KEY``
 
 ## 7. Operational Guides
 ### Triggering a Cloud Run
-1. Navigate to **AWS Console > Step Functions**.
-2.Select ```football-pipeline-orchestrator```.
-3.Click **Start Execution**.
-4.**Graph view**: Monitor the 3 parallel ingestion tasks followed by the dbt transformation.
+- 1. Navigate to **AWS Console > Step Functions**.
+- 2.Select ```football-pipeline-orchestrator```.
+- 3.Click **Start Execution**.
+- 4.**Graph view**: Monitor the 3 parallel ingestion tasks followed by the dbt transformation.
 
 ### Refreshing Snowflake Data
 External tables need a manual refresh to see new S3 files:
@@ -132,7 +132,7 @@ ALTER EXTERNAL TABLE FOOTBALL_LEAGUES_DB.RAW.RAW_FIXTURES REFRESH;
 ### Common Errors
 **Terraform Lock**: If a run fails with ``Error acquiring state lock``, run locally:
 ```terraform force-unlock <LOCK_ID>``` in infrastructure/aws.
-**Snowflake 404**: Check that the account identifier in your .env is correctly formatted (ORG-ACCOUNT).
-**Empty Tables**: If staging tables have data but Dims/Facts are empty, run dbt with the ```--full-refresh``` flag to reset incremental logic.
-**Docker Timeout**: If pushing to ECR fails, simply rerun the command; the script will resume from the last successful layer
+- **Snowflake 404**: Check that the account identifier in your .env is correctly formatted (ORG-ACCOUNT).
+- **Empty Tables**: If staging tables have data but Dims/Facts are empty, run dbt with the ```--full-refresh``` flag to reset incremental logic.
+- **Docker Timeout**: If pushing to ECR fails, simply rerun the command; the script will resume from the last successful layer
 
