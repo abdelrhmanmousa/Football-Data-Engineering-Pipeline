@@ -17,7 +17,7 @@ The system runs in two modes with complete feature parity:
 The system uses a **Hybrid Architecture** to optimize for both Developer Experience (Local) and Cost-Effective Scaling (Cloud).
 
 ### 🗺️ System Flow
-![Architecture Diagram](Docs/assets/diagram-export-12-27-2025-9_42_33-AM.png)
+![Architecture Diagram](Docs/assets/Architecture.png)
 
 *   **Idempotent Ingestion:** "Smart Resume" logic checks storage before fetching, preventing API rate-limit exhaustion from football data providers.
 *   **Hybrid Design:** Switch between a local lightweight stack and a heavy-duty enterprise cloud stack with a single config change.
