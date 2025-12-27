@@ -27,6 +27,9 @@ The system uses a **Hybrid Architecture** to optimize for both Developer Experie
 ## 🔄 CI/CD & DevOps
 We utilize **GitHub Actions** for a fully automated DevSecOps workflow. 🛡️
 
+### 🗺️ CI/CD Workflow
+![CI/CD Diagram](Docs/assets/cicd_architecture.png)
+
 *   **🔐 Security:** Keyless authentication via **AWS OIDC** (No long-lived access keys in GitHub).
 *   **🤖 Automation:** Decoupled pipelines for Quality Assurance, Infrastructure (IaC), and Application Code.
 *   **🧪 Quality:** Automated linting and unit testing for Python and dbt transformations.
