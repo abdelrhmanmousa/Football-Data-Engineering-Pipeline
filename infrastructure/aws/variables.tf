@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS Region"
   type        = string
-  default     = "us-east-1"
+  default     = "af-south-1"
 }
 
 variable "project_name" {
@@ -60,9 +60,9 @@ variable "snowflake_external_id" {
   default     = ""
 }
 
-# RAWG API Key (Passed to ECS)
+# football API Key (Passed to ECS)
 variable "football_api_key" {
-  description = "API Key for RAWG (passed to ECS)"
+  description = "API Key for football data (passed to ECS)"
   type        = string
   sensitive   = true
 }
