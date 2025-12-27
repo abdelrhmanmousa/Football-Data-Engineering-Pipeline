@@ -1,44 +1,44 @@
-# 1. The Schedule (The Alarm Clock)
-resource "aws_cloudwatch_event_rule" "daily_run" {
-  name                = "${var.project_name}-daily-trigger"
-  description         = "Triggers the Football Pipeline every day at 02:00 UTC"
-  # Cron Syntax: Minutes Hours DayOfMonth Month DayOfWeek Year
-  schedule_expression = "cron(0 2 * * ? *)" 
-}
-
-# 2. The IAM Role (Permission to press the button)
+# The iam Role for the Scheduler
 resource "aws_iam_role" "scheduler_role" {
   name = "${var.project_name}-scheduler-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
       Principal = { Service = "events.amazonaws.com" }
     }]
   })
 }
 
-# Grant permission to Start the Step Function
-resource "aws_iam_role_policy" "scheduler_policy" {
+resource "aws_iam_policy" "scheduler_policy" {
   name = "${var.project_name}-scheduler-policy"
-  role = aws_iam_role.scheduler_role.id
-
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect = "Allow"
-      Action = ["states:StartExecution"]
-      # Point to the Step Function we created in workflow.tf
+      Effect   = "Allow"
+      Action   = ["states:StartExecution"]
       Resource = [aws_sfn_state_machine.pipeline.arn]
     }]
   })
 }
 
-# 3. The Target (Connecting the Clock to the Brain)
-resource "aws_cloudwatch_event_target" "trigger_pipeline" {
-  rule      = aws_cloudwatch_event_rule.daily_run.name
+resource "aws_iam_role_policy_attachment" "scheduler_attach" {
+  role       = aws_iam_role.scheduler_role.name
+  policy_arn = aws_iam_policy.scheduler_policy.arn
+}
+
+# The Schedule Rule (Daily at Midnight UTC)
+resource "aws_cloudwatch_event_rule" "daily_trigger" {
+  name                = "${var.project_name}-daily-run"
+  description         = "Triggers the Game Market Pipeline every day at midnight"
+  schedule_expression = "cron(0 0 * * ? *)" # Runs at 00:00 UTC
+}
+
+# The Target (Connect Rule -> Step Function)
+resource "aws_cloudwatch_event_target" "sfn_target" {
+  rule      = aws_cloudwatch_event_rule.daily_trigger.name
   target_id = "TriggerStepFunction"
   arn       = aws_sfn_state_machine.pipeline.arn
   role_arn  = aws_iam_role.scheduler_role.arn
