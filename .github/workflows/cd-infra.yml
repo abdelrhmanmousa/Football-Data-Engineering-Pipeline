@@ -57,5 +57,5 @@ jobs:
           TF_VAR_snowflake_schema: "ANALYTICS"
 
 
-          RAWG_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
+          FOOTBALL_API_KEY: ${{ secrets.FOOTBALL_API_KEY }}
         run: make prod-infra-apply
