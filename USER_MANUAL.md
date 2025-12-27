@@ -113,16 +113,16 @@ The project is fully automated via GitHub Actions.
        - .. ```CD - Application```: Automatically builds and pushes Docker images to ECR.
 
 ### Required GitHub Secrets:
-    - .``AWS_ACCOUNT_ID``, ``AWS_REGION``,`` ROLE_ARN``
-    .``SNOWFLAKE_PASSWORD``, ``SNOWFLAKE_ACCOUNT_NAME``, ``SNOWFLAKE_ORGANIZATION_NAME``
-    .``FOOTBALL_API_KEY``
+    - AWS_ACCOUNT_ID, AWS_REGION ,ROLE_ARN
+    - SNOWFLAKE_PASSWORD, SNOWFLAKE_ACCOUNT_NAME, SNOWFLAKE_ORGANIZATION_NAME
+    - FOOTBALL_API_KEY
 
 ## 7. Operational Guides
 ### Triggering a Cloud Run
-- 1. Navigate to **AWS Console > Step Functions**.
-- 2.Select ```football-pipeline-orchestrator```.
-- 3.Click **Start Execution**.
-- 4.**Graph view**: Monitor the 3 parallel ingestion tasks followed by the dbt transformation.
+-  Navigate to **AWS Console > Step Functions**.
+- Select ```football-pipeline-orchestrator```.
+- Click **Start Execution**.
+- **Graph view**: Monitor the 3 parallel ingestion tasks followed by the dbt transformation.
 
 ### Refreshing Snowflake Data
 External tables need a manual refresh to see new S3 files:
