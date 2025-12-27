@@ -1,30 +1,3 @@
-# resource "aws_iam_role" "sfn_role" {
-#   name = "${var.project_name}-sfn-role"
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [{
-#       Action = "sts:AssumeRole"
-#       Effect = "Allow"
-#       Principal = { Service = "states.amazonaws.com" }
-#     }]
-#   })
-# }
-
-# resource "aws_iam_role_policy" "sfn_policy" {
-#   name = "${var.project_name}-sfn-policy"
-#   role = aws_iam_role.sfn_role.id
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Effect = "Allow"
-#         Action = ["ecs:RunTask", "iam:PassRole", "events:PutTargets", "events:PutRule", "events:DescribeRule"]
-#         Resource = "*"
-#       }
-#     ]
-#   })
-# }
-
 # THE STATE MACHINE (The Graph)
 resource "aws_sfn_state_machine" "pipeline" {
   name     = "${var.project_name}-orchestrator"
@@ -47,7 +20,7 @@ resource "aws_sfn_state_machine" "pipeline" {
                 Parameters = {
                   LaunchType = "FARGATE",
                   Cluster = aws_ecs_cluster.main.arn,
-                  TaskDefinition = aws_ecs_task_definition.ingestion.arn,
+                  TaskDefinition = aws_ecs_task_definition.ingestion_task.arn,
                   NetworkConfiguration = {
                     AwsvpcConfiguration = {
                       Subnets        = data.aws_subnets.default.ids
@@ -76,7 +49,7 @@ resource "aws_sfn_state_machine" "pipeline" {
                 Parameters = {
                   LaunchType = "FARGATE",
                   Cluster = aws_ecs_cluster.main.arn,
-                  TaskDefinition = aws_ecs_task_definition.ingestion.arn,
+                  TaskDefinition = aws_ecs_task_definition.ingestion_task.arn,
                   NetworkConfiguration = {
                     AwsvpcConfiguration = {
                       Subnets        = data.aws_subnets.default.ids
@@ -105,7 +78,7 @@ resource "aws_sfn_state_machine" "pipeline" {
                 Parameters = {
                   LaunchType = "FARGATE",
                   Cluster = aws_ecs_cluster.main.arn,
-                  TaskDefinition = aws_ecs_task_definition.ingestion.arn,
+                  TaskDefinition = aws_ecs_task_definition.ingestion_task.arn,
                   NetworkConfiguration = {
                     AwsvpcConfiguration = {
                       Subnets        = data.aws_subnets.default.ids
@@ -133,7 +106,7 @@ resource "aws_sfn_state_machine" "pipeline" {
         Parameters = {
           LaunchType = "FARGATE",
           Cluster = aws_ecs_cluster.main.arn,
-          TaskDefinition = aws_ecs_task_definition.analytics.arn,
+          TaskDefinition = aws_ecs_task_definition.analytics_task.arn,
           NetworkConfiguration = {
             AwsvpcConfiguration = {
                 Subnets        = data.aws_subnets.default.ids
@@ -143,8 +116,10 @@ resource "aws_sfn_state_machine" "pipeline" {
           },
           Overrides = {
             ContainerOverrides = [{
-              Name = "dbt-container",
-              Command = ["dbt", "run", "--target", "prod"]
+              Name = "analytics-container",
+              Command = ["/bin/sh", "-c", "dbt build --target snowflake"]
+              ## run this to force full refresh for the first time
+              ##Command = ["/bin/sh", "-c", "dbt build --target snowflake","--full-refresh"]
             }]
           }
         },
