@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 env:
-  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_REGION: af-south-1
   # Dynamic ARN construction using the Secret
   ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/football-pipeline-github-actions-role
 
