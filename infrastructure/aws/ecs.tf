@@ -1,18 +1,26 @@
 resource "aws_ecs_cluster" "main" {
   name = "${var.project_name}-cluster"
 }
-
-resource "aws_cloudwatch_log_group" "logs" {
-  name = "/ecs/${var.project_name}"
+# Logs
+resource "aws_cloudwatch_log_group" "ingestion_logs" {
+  name              = "/ecs/ingestion"
+  retention_in_days = 7
+  skip_destroy      = false
 }
 
-# --- TASK 1: INGESTION ---
-resource "aws_ecs_task_definition" "ingestion" {
-  family                   = "ingestion"
+resource "aws_cloudwatch_log_group" "analytics_logs" {
+  name              = "/ecs/analytics"
+  retention_in_days = 7
+  skip_destroy      = false
+}
+
+# INGESTION TASK
+resource "aws_ecs_task_definition" "ingestion_task" {
+  family                   = "ingestion-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = 256
-  memory                   = 512
+  cpu                      = "256"
+  memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
@@ -21,46 +29,51 @@ resource "aws_ecs_task_definition" "ingestion" {
     image     = "${aws_ecr_repository.ingestion_repo.repository_url}:latest"
     essential = true
     logConfiguration = {
-      logDriver = "awslogs"
+      logDriver = "awslogs",
       options = {
-        "awslogs-group" = aws_cloudwatch_log_group.logs.name
-        "awslogs-region" = var.aws_region
-        "awslogs-stream-prefix" = "ingestion"
+        "awslogs-group"         = "/ecs/ingestion",
+        "awslogs-region"        = var.aws_region,
+        "awslogs-stream-prefix" = "ecs",
       }
     }
     environment = [
-      { name = "DATA_LAKE_BUCKET", value = aws_s3_bucket.data_lake.bucket },
+      { name = "DATA_LAKE_BUCKET", value = aws_s3_bucket.data_lake.id },
       { name = "FOOTBALL_API_KEY", value = var.football_api_key }
     ]
   }])
 }
-
-# --- TASK 2: ANALYTICS (DBT) ---
-resource "aws_ecs_task_definition" "analytics" {
-  family                   = "analytics"
+# ANALYTICS TASK
+resource "aws_ecs_task_definition" "analytics_task" {
+  family                   = "analytics-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = 512
-  memory                   = 1024
+  cpu                      = "512"
+  memory                   = "1024"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([{
-    name      = "dbt-container"
+    name      = "analytics-container"
     image     = "${aws_ecr_repository.analytics_repo.repository_url}:latest"
     essential = true
     logConfiguration = {
-      logDriver = "awslogs"
+      logDriver = "awslogs",
       options = {
-        "awslogs-group" = aws_cloudwatch_log_group.logs.name
-        "awslogs-region" = var.aws_region
-        "awslogs-stream-prefix" = "dbt"
+        "awslogs-group"         = "/ecs/analytics",
+        "awslogs-region"        = var.aws_region,
+        "awslogs-stream-prefix" = "ecs",
       }
     }
     environment = [
-      { name = "SNOWFLAKE_ACCOUNT", value = var.snowflake_account_name },
+      { name = "SNOWFLAKE_ACCOUNT_NAME", value = var.snowflake_account_name },
+      { name = "SNOWFLAKE_ORGANIZATION_NAME", value = var.snowflake_organization_name },
       { name = "SNOWFLAKE_USER", value = var.snowflake_user },
-      { name = "SNOWFLAKE_PASSWORD", value = var.snowflake_password }
+      { name = "SNOWFLAKE_PASSWORD", value = var.snowflake_password },
+      { name = "SNOWFLAKE_ROLE", value = var.snowflake_role },
+      { name = "SNOWFLAKE_WAREHOUSE", value = var.snowflake_warehouse },
+      { name = "SNOWFLAKE_DATABASE", value = var.snowflake_database },
+      { name = "SNOWFLAKE_SCHEMA", value = var.snowflake_schema },
+      { name = "DBT_PROFILES_DIR", value = "/app" }
     ]
   }])
 }
