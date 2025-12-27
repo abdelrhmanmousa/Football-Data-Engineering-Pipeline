@@ -3,9 +3,9 @@ from dagster_dbt import dbt_assets, DbtCliResource
 import os
 
 # Import your actual Ingestion Logic
-from ingestion.src.entities.fixtures import FixturesIngestion
-from ingestion.src.entities.players import PlayersIngestion
-from ingestion.src.entities.standings import StandingsIngestion
+from ingestion.ingestion.entities.fixtures import FixturesIngestion
+from ingestion.ingestion.entities.players import PlayersIngestion
+from ingestion.ingestion.entities.standings import StandingsIngestion
 # from ingestion.src.entities.players import PlayersIngestion
 
 from .resources import DBT_PROJECT_DIR
